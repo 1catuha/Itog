@@ -10,10 +10,10 @@ driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().
 driver.get('http://the-internet.herokuapp.com/inputs')
 
 search_filed = driver.find_element(By.CSS_SELECTOR, 'input')
-search_filed.send_keys("капитошка")
+search_filed.send_keys("Sky")
 
 search_filed.clear()
 
 
-search_filed.send_keys("картошка")
-driver.quit
+search_filed.send_keys("Pro")
+driver.quit ()
