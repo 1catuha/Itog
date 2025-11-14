@@ -1,20 +1,28 @@
 import pytest
 from selenium import webdriver
 from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.firefox.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 
 
-options = webdriver.FirefoxOptions()
-driver = webdriver.Firefox(options=options)
-
-
 @pytest.fixture
-def test_buttons():
-    driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().
-                                                  install()))
+def driver():
+    service = FirefoxService(GeckoDriverManager().install())
+    options = webdriver.FirefoxOptions
+    
+
+    drv = webdriver.Firefox(service=service, options=options)
+    drv.implicitly_wait(15)
+    yield drv
+    drv.quit()
+ 
+
+def test_buttons(driver: WebDriver):
+   
     driver.get("https://www.saucedemo.com/")
 
     username_field = driver.find_element(By.ID, "user-name")

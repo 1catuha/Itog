@@ -1,37 +1,42 @@
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
+from selenium.webdriver.chrome.options import Options as ChromeOptions
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.keys import Keys
 
-
-options = webdriver.ChromeOptions()
-driver = webdriver.Chrome(options=options)
 
 @pytest.fixture
-def test_buttons():
-    browser = webdriver.Chrome(
-    service=ChromeService(ChromeDriverManager().install()))
+def driver():
+    service = ChromeService(ChromeDriverManager().install())
+    options = webdriver.ChromeOptions()
 
+    drv = webdriver.Chrome(service=service, options=options)
+    drv.implicitly_wait(15)
+    yield drv
+    drv.quit()
 
-    browser.get(
-        'https://bonigarcia.dev/selenium-webdriver-java/slow-calculator.html')
+def test_buttons(driver: WebDriver):
+    driver.get('https://bonigarcia.dev/selenium-webdriver-java/slow-calculator.html')
 
-    input = browser.find_element(By.CSS_SELECTOR, '#delay')
-    input.send_keys('1')
+    input = driver.find_element(By.CSS_SELECTOR, '#delay')
+    input.clear()
+    input.send_keys("45")
 
-    button_7 = browser.find_element(By.XPATH, '//span[text()="7"]').click()
-    button_plus = browser.find_element(By.XPATH, '//span[text()="+"]').click()
-    button_8 = browser.find_element(By.XPATH, '//span[text()="8"]').click()
-    button_equals = browser.find_element(By.XPATH, '//span[text()="="]').click()
-    waiter = WebDriverWait(browser, 52)
-    waiter.until(
-        EC.text_to_be_present_in_element((By.CSS_SELECTOR, 'div.screen'), '15')
-        )
+    driver.find_element(By.XPATH, '//span[text()="7"]').click()
+    driver.find_element(By.XPATH, '//span[text()="+"]').click()
+    driver.find_element(By.XPATH, '//span[text()="8"]').click()
+    driver.find_element(By.XPATH, '//span[text()="="]').click()
+    WebDriverWait(driver, 60).until(
+        EC.presence_of_element_located(By.CSS_SELECTOR, ".screen"), "15")
+    WebDriverWait(driver, 60).until(
+        EC.text_to_be_present_in_element((By.CSS_SELECTOR, ".screen"), "15"))
 
-    result = browser.find_element(By.CSS_SELECTOR, 'div.screen').text
-    print(result)
+    result = driver.find_element(By.CSS_SELECTOR, ".screen").text
 
-    assert result =='15'
+    assert result == "15"
+

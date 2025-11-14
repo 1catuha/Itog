@@ -15,7 +15,7 @@ def driver():
    drv = webdriver.Edge(service=service, options=options)
    drv.implicitly_wait(4)
    yield drv
-   drv.quit
+   drv.quit()
 
 
 def test_buttons(driver: WebDriver):
